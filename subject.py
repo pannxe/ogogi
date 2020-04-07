@@ -13,7 +13,7 @@ def compile(fileName, userID, language):
     os.system('rm compiled/' + fileName)
 
     if(language not in config.lang):
-        return 'L'
+        return 
     print('Compiling subject\'s file ...')
 
     compileCMD  =   config.lang[language]['compile']

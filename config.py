@@ -11,6 +11,12 @@ lang = {
         'system'    : 'find /usr/bin/ -name g++',
         'compile'   : 'g++ ../uploaded/[userID]/[subjectFileName].cpp -O2 -fomit-frame-pointer -o compiled/[subjectFileName]'+ IORedirect,
         'execute'   : 'compiled/[binName][inputFile]'
+    },
+    'Golang' : {
+        'extension' : 'go',
+        'system'    : 'find /usr/bin/ -name go',
+        'compile'   : 'go tool compile -o compiled/[subjectFileName] ../uploaded/[userID]/[subjectFileName].go' + IORedirect,
+        'execute'   : 'compiled/[binName][inputFile]'
     }
 }
 
@@ -22,4 +28,3 @@ solutionPath    = 'source/[probName]/[#].sol'
 
 caseKey         = 'cases = '
 caseKeyEnd      = ';'
-
