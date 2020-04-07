@@ -1,3 +1,11 @@
+import subprocess
+import os
+import signal
+
+import config
+import time
+import enum
+
 # Compile the subject
 def compile(fileName, userID, language):
     # God-damned dangerous 777. Change it maybe?
@@ -5,11 +13,9 @@ def compile(fileName, userID, language):
     os.system('rm compiled/' + fileName)
 
     if(language not in config.lang):
-        return
-    
+        return 'L'
     print('Compiling subject\'s file ...')
 
-    result      =   None
     compileCMD  =   config.lang[language]['compile']
     compileCMD  =   compileCMD.replace('[subjectFileName]', fileName)
     compileCMD  =   compileCMD.replace('[userID]', userID)
@@ -17,14 +23,13 @@ def compile(fileName, userID, language):
     os.system(compileCMD)
 
     if not os.path.exists('compiled/' + fileName):
-        result = '\t--> Error: Failed to compile subject\'s file.'
+        print('\t--> Error: Failed to compile subject\'s file.')
+        return 'Compilation error'
 
-    if result == None:
-        print('\t--> Subject\'s file successfully compiled.')
-    else:
-        print(result)
+    print('\t--> Subject\'s file successfully compiled.')
+    return None
 
-    return result
+  
 
 # Execute the subject
 def execute(language, userID, probName, probID, testcase, timeLimit, memLimit, uploadTime):
@@ -54,6 +59,6 @@ def execute(language, userID, probName, probID, testcase, timeLimit, memLimit, u
     elapsedTime = time.time() - startTime
     
     os.system('chmod 777 .')
-    if(os.path.exists('/proc/'+str(proc.pid))):
+    if(os.path.exists('/proc/' + str(proc.pid))):
         os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
     return t, elapsedTime

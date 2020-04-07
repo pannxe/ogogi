@@ -1,3 +1,7 @@
+import codecs
+import os
+import time
+
 def read(filename):
     if not os.path.exists(filename):
         return ""

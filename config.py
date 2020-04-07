@@ -13,3 +13,13 @@ lang = {
         'execute'   : 'compiled/[binName][inputFile]'
     }
 }
+
+scriptPath      = 'source/[probName]/script.php'
+subjectFileName = '[probID]_[uploadTime]'
+
+resultPath      = 'env/output.txt'
+solutionPath    = 'source/[probName]/[#].sol'
+
+caseKey         = 'cases = '
+caseKeyEnd      = ';'
+
