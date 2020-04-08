@@ -2,7 +2,7 @@
 
 **OGOGI** stands for **OTOG Grader that is Optimized. Plus it can now Grade Interactive problem** (previously known as otogGraderII)
 
-This is an attempt to improve [otogGrader](otog.cf) mainly by implementing interactive script. OGOGI is also planed to use Cython for better performance.
+This is an attempt to improve [otogGrader](https://otog.cf/) mainly by implementing interactive script. OGOGI is also planed to use Cython for better performance.
 
 ## Now implemented
 
