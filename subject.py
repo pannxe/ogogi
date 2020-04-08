@@ -4,7 +4,8 @@ import signal
 
 import config
 import time
-import enum
+import otogEnum
+import fileIO
 
 # Compile the subject
 def compile(fileName, userID, language):
@@ -12,9 +13,10 @@ def compile(fileName, userID, language):
     os.system('chmod 777 compiled/' + fileName)
     os.system('rm compiled/' + fileName)
 
-    if(language not in config.lang):
-        return 
-    print('Compiling subject\'s file ...')
+    if language not in config.lang:
+        return 'NOLANG'
+    
+    print('Compiling subject\'s file')
 
     compileCMD  =   config.lang[language]['compile']
     compileCMD  =   compileCMD.replace('[subjectFileName]', fileName)
@@ -23,10 +25,8 @@ def compile(fileName, userID, language):
     os.system(compileCMD)
 
     if not os.path.exists('compiled/' + fileName):
-        print('\t--> Error: Failed to compile subject\'s file.')
-        return 'Compilation error'
+        return 'NOCMP'
 
-    print('\t--> Subject\'s file successfully compiled.')
     return None
 
   
@@ -54,7 +54,7 @@ def execute(language, userID, probName, probID, testcase, timeLimit, memLimit, u
         proc.communicate(timeout=timeLimit)
         t = proc.returncode
     except subprocess.TimeoutExpired:
-        t = enum.ESC['TLE']
+        t = otogEnum.ESC['TLE']
 
     elapsedTime = time.time() - startTime
     

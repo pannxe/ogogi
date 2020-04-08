@@ -2,10 +2,12 @@
 
 import os
 import time
-import mysql.connector
+
+# For local debugging
+import localDebugger as mysql
+# import mysql.connector
 
 # Modularized parts
-import enum
 import fileIO
 import config
 import subject
@@ -44,16 +46,16 @@ def cmpFunc(fname1, fname2):
     return True
 
 
-def gradeSubject(submission, myCursor, mydb):
+def gradeSubject(submission, myCursor):
     # TODO : Move this shit to the new fuction (or new file).
 
     # Reassign for better readability
-    uploadTime  = str(submission[1])
     resultID    = submission[0]
+    uploadTime  = str(submission[1])
     userID      = str(submission[2])
     probID      = str(submission[3])
     inContest   = submission[9]
-    fileLang    = submission[10]
+    language    = submission[10]
 
     print('====================================')
     print(submission[:4])
@@ -72,80 +74,117 @@ def gradeSubject(submission, myCursor, mydb):
     lastTest    = 0
     nCase       = 0
 
+    # Interprete subject source file name
     subjectFileName = config.subjectFileName.\
         replace('[probID]',     probID).\
         replace('[uploadTime]', uploadTime)
 
-    result = subject.compile(subjectFileName, userID, fileLang)
-    scriptPath = config.scriptPath.replace('[probName]', probName)
+    # Compile subject's source file
+    result = subject.compile(subjectFileName, userID, language)
 
-    if os.path.exists(scriptPath):
-        case = fileIO.read(scriptPath)
-        numStart = case.find(config.caseKey) + len(config.caseKey)
-        numEnd = case.find(config.caseKeyEnd)
+    # Interprete config file
+    case = ''
+    nBegin = 0
+    nEnd = 0
+    # For compatibity with legacy 'script.php' from otog.org era.
+    legacyPath = config.legacyScriptPath.replace('[probName]', probName)
+    # otogGrader 2.0 now uses 'config.cfg' instead.
+    configPath = config.configPath.replace('[probName]', probName)
+    
+    if os.path.exists(legacyPath):
+        case = fileIO.read(legacyPath)
+        nBegin = case.find(config.legacyCaseKey) + len(config.legacyCaseKey)
+        nEnd = case.find(config.legacyCaseKeyEnd)
+    elif os.path.exists(configPath):
+        case = fileIO.read(configPath)
+        nBegin = case.find(config.caseKey) + len(config.caseKey)
+        nEnd = case.find(config.caseKeyEnd)
+    else:
+        result = 'NOCONFIG'
+
+    # If no error reading config file, print number of case to console
+    if result != 'NOCONFIG':
         # Unlimited # of testcase
-        nCase = int(case[numStart:numEnd])
+        nCase = int(case[nBegin:nEnd])
         print('# of testcase : ' + nCase)
-    else:
-        nCase = -1
-        result = 'No Testcases.'
 
-    if probInfo[8] and inContest:
-        subtask = probInfo[8].split(' ')
-    else:
-        subtask = [nCase]
-
-    if(result == None):
-        for sub in subtask:
-            if inContest:
-                allResult += '['
-            if not perfect:
+    # If there is no problem compiling, grade the subject.
+    if result == None :
+        print('Subject\'s file successfully compiled.')
+        if probInfo[8] and inContest :
+            subtask = probInfo[8].split(' ')
+        else :
+            subtask = [nCase]
+        if os.path.exists('script.py') :
+            print('Interactive script enabled. Running ...')
+            # -----------------------
+            # TODO Interactive stuff
+            # -----------------------
+        else:
+            # TODO Move this thing to another file
+            for sub in subtask:
+                if inContest:
+                    allResult += '['
+                if not perfect:
+                    for x in range(lastTest, int(sub)):
+                        allResult += 'S'
+                    if inContest:
+                        allResult += ']'
+                    lastTest = int(sub)
+                    continue
                 for x in range(lastTest, int(sub)):
-                    allResult += 'S'
+                    result = None
+                    t, elapsedTime = subject.execute(
+                        language, userID, probName, probID,
+                        str(x + 1), timeLimit, 1024*memLimit, uploadTime
+                    )
+                    result = handler.runtimeHandler(t)
+                    sumTime += elapsedTime
+
+                    resultPath = config.resultPath
+                    solutionPath = config.solutionPath.\
+                        replace('[probName]', probName).\
+                        replace('[#]', str(x + 1))
+
+                    if(result == None and t == 0):
+                        if(cmpFunc(resultPath, solutionPath)):
+                            allResult += 'P'
+                            cnt += 1
+                        else:
+                            perfect = False
+                            allResult += '-'
+                    elif(result == 'TLE'):
+                        allResult += 'T'
+                        perfect = False
+                    else:
+                        allResult += 'X'
+                        perfect = False
+
+                    sql = 'UPDATE Result SET result = %s WHERE idResult = %s'
+                    val = ('Running in testcase #' + str(x+1), resultID)
+                    myCursor.execute(sql, val)
+                    mydb.commit()
                 if inContest:
                     allResult += ']'
                 lastTest = int(sub)
-                continue
-            for x in range(lastTest, int(sub)):
-                result = None
-                t, elapsedTime = subject.execute(
-                    fileLang, userID, probName, probID,
-                    str(x + 1), timeLimit, 1024*memLimit, uploadTime
-                )
-                result = handler.runtimeHandler(t)
-                sumTime += elapsedTime
+        # End else
+    # Compile error
+    elif result == 'NOCMP' :
+        print('Error: Failed to compile subject\'s file.')
+        # Try to read error message
+        try :
+            errmsg = fileIO.read('env/error.txt')
+        except :
+            errmsg = 'Cannot read error log. Unknown problem occured.'
+    # File extension not supported
+    elif result == 'NOLANG' :
+        errmsg = 'Language not supported. Please check file extension.'
+        print('Error: Language not supported.')
+    # Missing config file (config.cfg or script.php)
+    elif result == 'NOCONFIG' :
+        errmsg = 'Cannot read config file. Please contact admins.'
+        print('Error: config.cfg or script.php is missing.')
 
-                resultPath = config.resultPath
-                solutionPath = config.solutionPath.\
-                    replace('[probName]', probName).\
-                    replace('[#]', str(x + 1))
-
-                if(result == None and t == 0):
-                    if(cmpFunc(resultPath, solutionPath)):
-                        allResult += 'P'
-                        cnt += 1
-                    else:
-                        perfect = False
-                        allResult += '-'
-                elif(result == 'TLE'):
-                    allResult += 'T'
-                    perfect = False
-                else:
-                    allResult += 'X'
-                    perfect = False
-
-                sql = 'UPDATE Result SET result = %s WHERE idResult = %s'
-                val = ('Running in testcase #' + str(x+1), resultID)
-                myCursor.execute(sql, val)
-                mydb.commit()
-
-            if inContest:
-                allResult += ']'
-            lastTest = int(sub)
-    try:
-        errmsg = fileIO.read('env/error.txt')
-    except:
-        errmsg = 'Something went wrong.'
 
     print('TIME : ' + str(sumTime))
     percentage = (cnt / nCase) * 100
@@ -160,7 +199,9 @@ while True:
     myCursor = mydb.cursor(buffered=True)
     myCursor.execute('SELECT * FROM Result WHERE status = 0 ORDER BY time')
     submission = myCursor.fetchone()
-    if(submission != None):
-        gradeSubject(submission, myCursor, mydb)
+    if(submission != None) :
+        gradeSubject(submission, myCursor)
+    else :
+        print('Error : submission from SQL = None')
     mydb.commit()
     time.sleep(1)

@@ -12,6 +12,7 @@ lang = {
         'compile'   : 'g++ ../uploaded/[userID]/[subjectFileName].cpp -O2 -fomit-frame-pointer -o compiled/[subjectFileName]'+ IORedirect,
         'execute'   : 'compiled/[binName][inputFile]'
     },
+    # Test adding new language via config.lang
     'Golang' : {
         'extension' : 'go',
         'system'    : 'find /usr/bin/ -name go',
@@ -20,11 +21,17 @@ lang = {
     }
 }
 
-scriptPath      = 'source/[probName]/script.php'
-subjectFileName = '[probID]_[uploadTime]'
+legacyScriptPath      = 'source/[probName]/script.php'
+configPath            = 'source/[probName]/config.cfg'
+subjectFileName       = '[probID]_[uploadTime]'
 
 resultPath      = 'env/output.txt'
 solutionPath    = 'source/[probName]/[#].sol'
 
-caseKey         = 'cases = '
-caseKeyEnd      = ';'
+legacyCaseKey         = 'cases = '
+legacyCaseKeyEnd      = ';'
+
+caseKey     = 'n_case '
+caseKeyEnd  = '\n'
+
+scriptPath = 'source/[probName]/grading_script.py'
