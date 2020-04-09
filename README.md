@@ -8,6 +8,7 @@ This is an attempt to improve [otogGrader](https://otog.cf/) mainly by implement
 
 - **Modularization.**
 - **Unlimited # of testcase.**
+- **Command mode (type ':')**
 - Improved debug console.
 - Cleaner code for better maintainent.
 - Minor performance improvement.
@@ -18,7 +19,7 @@ This is an attempt to improve [otogGrader](https://otog.cf/) mainly by implement
 Todo is short-term plans that ment to be done within current version.
 
 - **Implement interactive script module.**
-- Separate common grading script from grader.py.
+- **Add functionality to command mode**
 - Debug.
 - Error handling.
 
@@ -30,6 +31,16 @@ Features to add in future version.
 - Reimplement modules using class.
 - Add support for other languages. (to be considered)
 
+## External modules
+
+These are external modules used in this project.
+
+- Colorama
+
+```bash
+pip3 install colorama
+```
+
 ## Contributing
 
 YES, please :) Pull requests are welcome.
@@ -38,7 +49,7 @@ YES, please :) Pull requests are welcome.
 
 - **Karnjj** - *original work* - [Github](https://github.com/karnjj)
 - **pannxe** - *OGOGI project* - [Github](https://github.com/pannxe)
-- **Amethyst** - *Supervisor* - [Github](https://github.com/sctpimming)
+- **Amethyst** - *supervisor* - [Github](https://github.com/sctpimming)
 
 ## License
 
