@@ -18,8 +18,8 @@ This is an attempt to improve [otogGrader](https://otog.cf/) mainly by implement
 
 Todo is short-term plans that ment to be done within current version.
 
-- **Implement interactive script module.**
-- **Add functionality to command mode**
+- **Process buffer in interactiveScript.py**
+- **Add more functionality to command mode**
 - Debug.
 - Error handling.
 
@@ -35,7 +35,7 @@ Features to add in future version.
 
 These are external modules used in this project.
 
-- Colorama
+### Colorama
 
 ```bash
 pip3 install colorama

@@ -2,7 +2,6 @@ import subject
 import config
 import handler
 
-
 def cmpFunc(fname1, fname2):
     f1 = open(fname1)
     f2 = open(fname2)
@@ -40,8 +39,8 @@ def run(submission, probInfo, subtask):
     uploadTime = str(submission[1])
     userID = str(submission[2])
     probID = str(submission[3])
-    language = submission[10]
     inContest = submission[9]
+    language = submission[10]
 
     for sub in subtask:
         if inContest:
@@ -54,18 +53,17 @@ def run(submission, probInfo, subtask):
             lastTest = int(sub)
             continue
         for x in range(lastTest, int(sub)):
-            result = None
             t, elapsedTime = subject.execute(
                 language,
                 userID,
                 probName,
-                probID,
+                probID, 
                 str(x + 1),
                 timeLimit,
                 1024 * memLimit,
                 uploadTime,
             )
-            result = handler.runtimeHandler(t)
+            execResult = handler.runtimeHandler(t)
             sumTime += elapsedTime
 
             resultPath = config.resultPath
@@ -73,17 +71,19 @@ def run(submission, probInfo, subtask):
                 "[#]", str(x + 1)
             )
 
-            if result == None and t == 0:
+            if execResult == None and t == 0:
                 if cmpFunc(resultPath, solutionPath):
                     allResult += "P"
                 else:
                     perfect = False
                     allResult += "-"
-            elif result == "TLE":
+            elif execResult == "TLE":
                 allResult += "T"
                 perfect = False
             else:
                 allResult += "X"
                 perfect = False
-    lastTest = int(sub)
+            if inContest:
+                allResult += "]"
+            lastTest = int(sub)
     return (allResult, sumTime)

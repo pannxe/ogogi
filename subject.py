@@ -4,7 +4,7 @@ import signal
 
 import config
 import time
-import otogEnum
+import abb
 import fileIO
 
 # Compile the subject
@@ -32,13 +32,12 @@ def compile(fileName, userID, language):
 
 # Execute the subject
 def execute(
-    language, userID, probName, probID, testcase, timeLimit, memLimit, uploadTime
+    language, userID, probName, probID, atCase, timeLimit, memLimit, uploadTime
 ):
     exeName = probID + "_" + uploadTime
-    inputFile = (
-        " <source/" + probName + "/" + testcase + ".in 1>env/output.txt 2>env/error.txt"
+    IORedirect = (
+        "<source/" + probName + "/" + atCase + ".in 1>env/output.txt 2>env/error.txt"
     )
-
     cmd = (
         "ulimit -v "
         + str(memLimit)
@@ -46,7 +45,7 @@ def execute(
         + config.lang[language]["execute"]
         + "; exit;"
     )
-    cmd = cmd.replace("[binName]", exeName).replace("[inputFile]", inputFile)
+    cmd = cmd.replace("[binName]", exeName).replace("[IORedirect]", IORedirect)
 
     # Why do we have to chmod this?
     # os.system('chmod 777 .')
@@ -62,7 +61,7 @@ def execute(
         proc.communicate(timeout=timeLimit)
         t = proc.returncode
     except subprocess.TimeoutExpired:
-        t = otogEnum.ESC["TLE"]
+        t = abb.ESC["TLE"]
 
     elapsedTime = time.time() - startTime
 

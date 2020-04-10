@@ -2,6 +2,7 @@
 
 import os
 import time
+import datetime
 
 import mysql.connector
 
@@ -10,14 +11,18 @@ import fileIO
 import config
 import subject
 import standardScript
-import interactiveScript
-import otogEnum
+import abb
 import cmdMode
+import interactiveScript  # Interactive script manager
+
 from kbhit import KBHit
-from colorama import Style, Fore, init
+from colorama import Style, Fore, init # Terminal decoration
+
+ogogi_bare = abb.bold + Fore.YELLOW + 'OGOGI' + Style.RESET_ALL
+ogogi = '[ ' + ogogi_bare + ' ] '
 
 
-def gradeSubject(submission, probInfo):
+def onRecieved(submission, probInfo):
     # TODO : Move this shit to the new fuction (or new file).
 
     # Reassign for better readability
@@ -29,9 +34,9 @@ def gradeSubject(submission, probInfo):
     language = submission[10]
 
     print("Result ID :\t" + str(resultID))
-    print("Subject   :\t" + userID)
-    print("Prob ID   :\t" + probID)
+    print(abb.bold + "Subject   :\t" + userID)
     print("Sub Time  :\t" + uploadTime)
+    print(abb.bold + "Prob ID   :\t" + probID + Style.RESET_ALL)
     probName = str(probInfo[2])
 
     allResult = ""
@@ -54,62 +59,64 @@ def gradeSubject(submission, probInfo):
 
         print("nCase     :\t" + str(nCase), end='\n\n')
     else:
-        result = "NOCONFIG"
+        complieResult = "NOCONFIG"
 
     # Compile subject's source file
-    result = subject.compile(subjectFileName, userID, language)
+    complieResult = subject.compile(subjectFileName, userID, language)
 
     # If there is no problem compiling, grade the subject.
     errmsg = ""
-    if result == None:
-        print(otogEnum.ok + "Subject's file successfully compiled.")
+    if complieResult == None:
+        print(abb.ok + "Subject's file successfully compiled.")
         if probInfo[8] and inContest:
             subtask = probInfo[8].split(" ")
         else:
             subtask = [nCase]
-        if os.path.exists(config.interactivePath):
-            print("Interactive script enabled. Running ...")
+        # Interprete interactive_script.py path.
+        interactivePath = config.interactivePath.replace('[probName]', probName)
+        # If the problem is interacive...
+        if os.path.exists(interactivePath):
+            # run capooEngine
             allResult, sumTime = interactiveScript.run(
-                config.interactivePath, submission, probInfo, subtask
-            )
+                submission, probInfo, subtask)
         else:
             # run standard script
             allResult, sumTime = standardScript.run(submission, probInfo, subtask)
-        if inContest:
-            allResult += "]"
     # Compile error
-    elif result == "NOCMP":
+    elif complieResult == "NOCMP":
         allResult = "Compilation Error"
-        print(otogEnum.error + "Failed to compile subject's file.")
+        print(abb.error + "Failed to compile subject's file.")
         # Try to read error message
         try:
             errmsg = fileIO.read("env/error.txt")
         except:
+            print(abb.error + "Cannot read error log. Please check env/error.txt")
             errmsg = "Cannot read error log. Unknown problem occured."
     # File extension not supported
-    elif result == "NOLANG":
+    elif complieResult == "NOLANG":
         allResult = "Compilation Error"
         errmsg = "Language not supported. Please check file extension."
-        print(otogEnum.error + "Language not supported.")
+        print(abb.error + "Language not supported.")
     # Missing config file (config.cfg or script.php)
-    elif result == "NOCONFIG":
+    elif complieResult == "NOCONFIG":
         allResult = "Compilation Error"
         errmsg = "Cannot read config file. Please contact admins."
-        print(otogEnum.error + "config.cfg or script.php is missing.")
+        print(abb.error + "script.php is missing.")
 
+    # Calculate score
     percentage = 0
-    if result == None:
-        print("\nResult    :\t[" + otogEnum.bold, end="")
+    if complieResult == None:
+        print(abb.bold + "\nResult    :\t[" + abb.bold, end="")
         for e in allResult:
             if e == "P":
                 print(Fore.GREEN, end="")
             else:
                 print(Fore.RED, end="")
             print(e, end="")
-        print(Style.RESET_ALL + "]")
+        print(Style.RESET_ALL + abb.bold + "]")
         # Count correct answer by counting 'P'
         nCorrect = allResult.count("P")
-        print("Time      :\t" + str(round(sumTime, 2)) + ' s')
+        print("Time      :\t" + str(round(sumTime, 2)) + ' s' + Style.RESET_ALL)
         percentage = 100 * (nCorrect / nCase)
 
     return (allResult, percentage, round(sumTime, 2), errmsg, resultID)
@@ -127,48 +134,50 @@ if __name__ == "__main__":
         database="OTOG",
     )
 
-    flaged = False
     myCursor = mydb.cursor(buffered=True)
 
     # for keybord interupt.
+    print(ogogi + "Grader started. Waiting for submission...")
     kb = KBHit()
-    print("OGOGI started")
+    
     while True:
         # Looking for keyboard interupt.
         if kb.kbhit():
             c = kb.getch()
             if c == ':':
                 # Do function
-                print('Keyboard interupted. Entering command mode.')
+                print('\n', end="")
+                print(ogogi + 'Keyboard interupted. Entering command mode.')
                 kb.set_normal_term()
                 cmd = cmdMode.run()
                 # Shutdown signal
                 if cmd == 1:
                     break
                 kb.set_kbhit_term()
-                print('Command mode exited.')
+                print(ogogi +
+                      'Command mode exited. Continue waiting for submission.')
         
         myCursor.execute("SELECT * FROM Result WHERE status = 0 ORDER BY time")
         submission = myCursor.fetchone()
         if submission != None:
-            print("=============================================")
-            print(Fore.GREEN + "Submission recieved." + Style.RESET_ALL)
-            flaged = False
-
+            print(abb.bold + Fore.GREEN + "\t--> recieved.\n" + Style.RESET_ALL)
+            print(str(datetime.datetime.now().strftime(
+                "[ %d/%m/%y %H:%M:%S ]")) + ' -----------------------------')
+            
             myCursor.execute(
                 "SELECT * FROM Problem WHERE id_Prob = " + str(submission[3])
             )
             probInfo = myCursor.fetchone()
-
+            
             # Submit result
             sql = "UPDATE Result SET result = %s, score = %s, timeuse = %s, status = 1, errmsg = %s WHERE idResult = %s"
-            val = gradeSubject(submission, probInfo)
+            val = onRecieved(submission, probInfo)
             myCursor.execute(sql, val)
-            print("=============================================\n")
+            print('---------------------------------------------------')
+            print('\n' + ogogi +
+                  "Finished grading session. Waiting for the next one.")
 
-        elif not flaged:
-            print("Waiting for submission...\n")
-            flaged = True
         mydb.commit()
         time.sleep(config.gradingInterval)
-    print("OGOGI : Bye")
+    # Good-bye message
+    print(ogogi + "Bye")
