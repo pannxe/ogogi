@@ -83,7 +83,7 @@ def run(submission, probInfo, subtask):
             else:
                 allResult += "X"
                 perfect = False
-            if inContest:
-                allResult += "]"
+        if inContest:
+            allResult += "]"
             lastTest = int(sub)
     return (allResult, sumTime)
