@@ -16,10 +16,10 @@ import cmdMode
 import interactiveScript  # Interactive script manager
 
 from kbhit import KBHit
-from colorama import Style, Fore, init # Terminal decoration
+from colorama import Style, Fore, init  # Terminal decoration
 
-ogogi_bare = abb.bold + Fore.YELLOW + 'OGOGI' + Style.RESET_ALL
-ogogi = '[ ' + ogogi_bare + ' ] '
+ogogi_bare = abb.bold + Fore.YELLOW + "OGOGI" + Style.RESET_ALL
+ogogi = "[ " + ogogi_bare + " ] "
 
 
 def onRecieved(submission, probInfo):
@@ -57,7 +57,7 @@ def onRecieved(submission, probInfo):
         nEnd = case.find(config.caseKeyEnd)
         nCase = int(case[nBegin:nEnd])
 
-        print("nCase     :\t" + str(nCase), end='\n\n')
+        print("nCase     :\t" + str(nCase), end="\n\n")
     else:
         complieResult = "NOCONFIG"
 
@@ -73,12 +73,11 @@ def onRecieved(submission, probInfo):
         else:
             subtask = [nCase]
         # Interprete interactive_script.py path.
-        interactivePath = config.interactivePath.replace('[probName]', probName)
+        interactivePath = config.interactivePath.replace("[probName]", probName)
         # If the problem is interacive...
         if os.path.exists(interactivePath):
             # run capooEngine
-            allResult, sumTime = interactiveScript.run(
-                submission, probInfo, subtask)
+            allResult, sumTime = interactiveScript.run(submission, probInfo, subtask)
         else:
             # run standard script
             allResult, sumTime = standardScript.run(submission, probInfo, subtask)
@@ -116,7 +115,7 @@ def onRecieved(submission, probInfo):
         print(Style.RESET_ALL + abb.bold + "]")
         # Count correct answer by counting 'P'
         nCorrect = allResult.count("P")
-        print("Time      :\t" + str(round(sumTime, 2)) + ' s' + Style.RESET_ALL)
+        print("Time      :\t" + str(round(sumTime, 2)) + " s" + Style.RESET_ALL)
         percentage = 100 * (nCorrect / nCase)
 
     return (allResult, percentage, round(sumTime, 2), errmsg, resultID)
@@ -139,43 +138,43 @@ if __name__ == "__main__":
     # for keybord interupt.
     print(ogogi + "Grader started. Waiting for submission...")
     kb = KBHit()
-    
+
     while True:
         # Looking for keyboard interupt.
         if kb.kbhit():
             c = kb.getch()
-            if c == ':':
+            if c == ":":
                 # Do function
-                print('\n', end="")
-                print(ogogi + 'Keyboard interupted. Entering command mode.')
+                print("\n", end="")
+                print(ogogi + "Keyboard interupted. Entering command mode.")
                 kb.set_normal_term()
                 cmd = cmdMode.run()
                 # Shutdown signal
                 if cmd == 1:
                     break
                 kb.set_kbhit_term()
-                print(ogogi +
-                      'Command mode exited. Continue waiting for submission.')
-        
+                print(ogogi + "Command mode exited. Continue waiting for submission.")
+
         myCursor.execute("SELECT * FROM Result WHERE status = 0 ORDER BY time")
         submission = myCursor.fetchone()
         if submission != None:
             print(abb.bold + Fore.GREEN + "\t--> recieved.\n" + Style.RESET_ALL)
-            print(str(datetime.datetime.now().strftime(
-                "[ %d/%m/%y %H:%M:%S ]")) + ' -----------------------------')
-            
+            print(
+                str(datetime.datetime.now().strftime("[ %d/%m/%y %H:%M:%S ]"))
+                + " -----------------------------"
+            )
+
             myCursor.execute(
                 "SELECT * FROM Problem WHERE id_Prob = " + str(submission[3])
             )
             probInfo = myCursor.fetchone()
-            
+
             # Submit result
             sql = "UPDATE Result SET result = %s, score = %s, timeuse = %s, status = 1, errmsg = %s WHERE idResult = %s"
             val = onRecieved(submission, probInfo)
             myCursor.execute(sql, val)
-            print('---------------------------------------------------')
-            print('\n' + ogogi +
-                  "Finished grading session. Waiting for the next one.")
+            print("---------------------------------------------------")
+            print("\n" + ogogi + "Finished grading session. Waiting for the next one.")
 
         mydb.commit()
         time.sleep(config.gradingInterval)

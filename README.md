@@ -41,6 +41,14 @@ These are external modules used in this project.
 pip3 install colorama
 ```
 
+### Black
+
+For code formatting, use Black.
+
+```bash
+pip3 install black
+```
+
 ## Contributing
 
 YES, please :) Pull requests are welcome.

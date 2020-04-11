@@ -6,42 +6,46 @@ import os
 import fileIO
 import subprocess
 
-from colorama import Style, Fore, init  # Terminal decoration
-
 
 def callScript(**kwargs):
-    configPath = config.interactiveCfgPath.replace('[probName]', kwargs['probName'])
-    answerPath = config.interactiveAnsPath.replace(
-        '[probName]', kwargs['probName'])
-    scriptPath = config.interactivePath.replace(
-        '[probName]', kwargs['probName'])
+    configPath = config.interactiveCfgPath.replace("[probName]", kwargs["probName"])
+    answerPath = config.interactiveAnsPath.replace("[probName]", kwargs["probName"])
+    scriptPath = config.interactivePath.replace("[probName]", kwargs["probName"])
     if os.path.exists(configPath):
         os.system("chmod 777 " + configPath)
         os.system("rm " + configPath)
     if os.path.exists(answerPath):
         os.system("chmod 777 " + answerPath)
         os.system("rm " + answerPath)
-    
+
+    # Surely needed to be fixed
+
     fileIO.write(configPath, str(kwargs))
-    cmd = 'python3 ' + scriptPath + '; exit;'
+    cmd = "python3 " + scriptPath + "; exit;"
 
     subprocess.Popen([cmd], shell=True, preexec_fn=os.setsid)
-    
+
     buffer = fileIO.read(answerPath)
-    
-    # TODO Process buffer
-    #
-    print(buffer)
-    #
-    #
-    
+
+    # Process buffer
+    correctKey = buffer.find(config.interactiveResultKey) + len(
+        config.interactiveResultKey
+    )
+    correctKeyEnd = buffer.find(config.interactiveKeyEnd, correctKey)
+    correct = buffer[correctKey:correctKeyEnd]
+
+    timeKey = buffer.find(config.interactiveTimeKey) + len(config.interactiveTimeKey)
+    timeKeyEnd = buffer.find(config.interactiveKeyEnd, timeKey)
+    elapsedTime = int(buffer[timeKey:timeKeyEnd])
+
+    errKey = buffer.find(config.interactiveErrorKey) + len(config.interactiveErrorKey)
+    errKeyEnd = buffer.find(config.interactiveKeyEnd, errKey)
+    t = buffer[errKey:errKeyEnd]
 
     correct = False
-    t = ''
     elapsedTime = 0
 
     return correct, t, elapsedTime
-
 
 
 def run(submission, probInfo, subtask):

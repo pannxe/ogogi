@@ -44,3 +44,8 @@ interactiveCfgPath = "source/[probName]/interactive_cfg.cfg"
 interactiveAnsPath = "source/[probName]/interactive_answer.txt"
 
 gradingInterval = 1
+
+interactiveResultKey = "res "
+interactiveTimeKey = "time "
+interactiveErrorKey = "err  "
+interactiveKeyEnd = ";;"

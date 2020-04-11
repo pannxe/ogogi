@@ -2,6 +2,7 @@ import subject
 import config
 import handler
 
+
 def cmpFunc(fname1, fname2):
     f1 = open(fname1)
     f2 = open(fname2)
@@ -57,7 +58,7 @@ def run(submission, probInfo, subtask):
                 language,
                 userID,
                 probName,
-                probID, 
+                probID,
                 str(x + 1),
                 timeLimit,
                 1024 * memLimit,
