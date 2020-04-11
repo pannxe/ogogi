@@ -14,6 +14,8 @@ import standardScript
 import abb
 import cmdMode
 import interactiveScript  # Interactive script manager
+import importlib
+import sys
 
 from kbhit import KBHit
 from colorama import Style, Fore, init  # Terminal decoration
@@ -121,9 +123,11 @@ def onRecieved(submission, probInfo):
     return (allResult, percentage, round(sumTime, 2), errmsg, resultID)
 
 
+
 if __name__ == "__main__":
-    # Decorative purpose
+    # Decorative purpose.
     init()
+    # Nope, this is not the real otog.cf password XD.
     mydb = mysql.connector.connect(
         host="localhost",
         user="root",
@@ -144,14 +148,29 @@ if __name__ == "__main__":
         if kb.kbhit():
             c = kb.getch()
             if c == ":":
-                # Do function
-                print("\n", end="")
+                # Do functions.
                 print(ogogi + "Keyboard interupted. Entering command mode.")
                 kb.set_normal_term()
-                cmd = cmdMode.run()
-                # Shutdown signal
-                if cmd == 1:
-                    break
+                while True:
+                    cmd, args = cmdMode.run()
+                    # Shutdown signal
+                    if cmd == abb.INCMD["SHUTDOWN"]:
+                        # Good-bye message
+                        print(ogogi + "Bye")
+                        exit()
+                    elif cmd == abb.INCMD["RELOAD"]:
+                        # Reload modules in args
+                        for e in args:
+                            if e == 'grader':
+                                print(abb.error + "'grader' itself cannot be reloaded. Please restart the program manually.")
+                            try:
+                                importlib.reload(importlib.import_module(e))
+                            except:
+                                print(abb.error + "'" + e + "' cannot be reloaded.")
+                    elif cmd == abb.INCMD["EXIT"]:
+                        break
+                    
+
                 kb.set_kbhit_term()
                 print(ogogi + "Command mode exited. Continue waiting for submission.")
 
@@ -178,5 +197,3 @@ if __name__ == "__main__":
 
         mydb.commit()
         time.sleep(config.gradingInterval)
-    # Good-bye message
-    print(ogogi + "Bye")
