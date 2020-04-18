@@ -4,3 +4,4 @@ source/
 compiled/
 *.pyc
 env/
+install/installed

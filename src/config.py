@@ -38,14 +38,7 @@ caseKeyEnd = ";"
 
 scriptPath = "source/[probName]/script.php"
 
-interactivePath = "source/[probName]/interactive_script.py"
-interactiveCfgPath = "source/[probName]/interactive_cfg.cfg"
-
-interactiveAnsPath = "source/[probName]/interactive_answer.txt"
+interactiveName = "interactive_script.py"
+interactivePath = "source/[probName]/"
 
 gradingInterval = 1
-
-interactiveResultKey = "res "
-interactiveTimeKey = "time "
-interactiveErrorKey = "err  "
-interactiveKeyEnd = ";;"

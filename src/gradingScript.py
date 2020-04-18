@@ -1,6 +1,8 @@
-import subject
+import os
+import execu
 import config
 import handler
+import abb
 
 
 def cmpFunc(fname1, fname2):
@@ -42,6 +44,7 @@ def run(submission, probInfo, subtask):
     probID = str(submission[3])
     inContest = submission[9]
     language = submission[10]
+    interacive_flag = False
 
     for sub in subtask:
         if inContest:
@@ -54,7 +57,7 @@ def run(submission, probInfo, subtask):
             lastTest = int(sub)
             continue
         for x in range(lastTest, int(sub)):
-            t, elapsedTime = subject.execute(
+            t, elapsedTime = execu.execute(
                 language,
                 userID,
                 probName,
@@ -71,9 +74,25 @@ def run(submission, probInfo, subtask):
             solutionPath = config.solutionPath.replace("[probName]", probName).replace(
                 "[#]", str(x + 1)
             )
-
+            res = False
             if execResult == None and t == 0:
-                if cmpFunc(resultPath, solutionPath):
+                # Interprete interactive_script.py path.
+                interactivePath = config.interactivePath.replace("[probName]", probName)
+                # If the problem is interacive...
+                if os.path.exists(interactivePath + config.interactiveName):
+                    if not interacive_flag:
+                        print("\t--> This problem is interactive.")
+                        interacive_flag = True
+                    import sys
+
+                    sys.path.insert(1, "./" + interactivePath)
+                    import interactive_script
+
+                    # Call interactive script.
+                    res = interactive_script.cmp(resultPath, solutionPath)
+                else:
+                    res = cmpFunc(resultPath, solutionPath)
+                if res:
                     allResult += "P"
                 else:
                     perfect = False

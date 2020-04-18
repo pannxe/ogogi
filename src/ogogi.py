@@ -9,11 +9,10 @@ import mysql.connector
 # Modularized parts
 import fileIO
 import config
-import subject
-import standardScript
+import compileScript
+import gradingScript
 import abb
 import cmdMode
-import interactiveScript  # Interactive script manager
 import importlib
 import sys
 
@@ -25,8 +24,6 @@ ogogi = "[ " + ogogi_bare + " ] "
 
 
 def onRecieved(submission, probInfo):
-    # TODO : Move this shit to the new fuction (or new file).
-
     # Reassign for better readability
     resultID = submission[0]
     uploadTime = str(submission[1])
@@ -45,6 +42,8 @@ def onRecieved(submission, probInfo):
     sumTime = 0
     nCase = 0
 
+    complieResult = None
+
     # Interprete subject source file name
     subjectFileName = config.subjectFileName.replace("[probID]", probID).replace(
         "[uploadTime]", uploadTime
@@ -54,7 +53,7 @@ def onRecieved(submission, probInfo):
 
     if os.path.exists(scriptPath):
         # Unlimited # of testcase
-        case = fileIO.read(scriptPath)
+        case: os.path = fileIO.read(scriptPath)
         nBegin = case.find(config.caseKey) + len(config.caseKey)
         nEnd = case.find(config.caseKeyEnd)
         nCase = int(case[nBegin:nEnd])
@@ -64,7 +63,8 @@ def onRecieved(submission, probInfo):
         complieResult = "NOCONFIG"
 
     # Compile subject's source file
-    complieResult = subject.compile(subjectFileName, userID, language)
+    if complieResult == None:
+        complieResult = compileScript.compile(subjectFileName, userID, language)
 
     # If there is no problem compiling, grade the subject.
     errmsg = ""
@@ -74,15 +74,7 @@ def onRecieved(submission, probInfo):
             subtask = probInfo[8].split(" ")
         else:
             subtask = [nCase]
-        # Interprete interactive_script.py path.
-        interactivePath = config.interactivePath.replace("[probName]", probName)
-        # If the problem is interacive...
-        if os.path.exists(interactivePath):
-            # run capooEngine
-            allResult, sumTime = interactiveScript.run(submission, probInfo, subtask)
-        else:
-            # run standard script
-            allResult, sumTime = standardScript.run(submission, probInfo, subtask)
+        allResult, sumTime = gradingScript.run(submission, probInfo, subtask)
     # Compile error
     elif complieResult == "NOCMP":
         allResult = "Compilation Error"
@@ -123,8 +115,7 @@ def onRecieved(submission, probInfo):
     return (allResult, percentage, round(sumTime, 2), errmsg, resultID)
 
 
-
-if __name__ == "__main__":
+def main():
     # Decorative purpose.
     init()
     # Nope, this is not the real otog.cf password XD.
@@ -161,15 +152,17 @@ if __name__ == "__main__":
                     elif cmd == abb.INCMD["RELOAD"]:
                         # Reload modules in args
                         for e in args:
-                            if e == 'grader':
-                                print(abb.error + "'grader' itself cannot be reloaded. Please restart the program manually.")
+                            if e == "grader":
+                                print(
+                                    abb.error
+                                    + "'grader' itself cannot be reloaded. Please restart the program manually."
+                                )
                             try:
                                 importlib.reload(importlib.import_module(e))
                             except:
                                 print(abb.error + "'" + e + "' cannot be reloaded.")
                     elif cmd == abb.INCMD["EXIT"]:
                         break
-                    
 
                 kb.set_kbhit_term()
                 print(ogogi + "Command mode exited. Continue waiting for submission.")
@@ -197,3 +190,7 @@ if __name__ == "__main__":
 
         mydb.commit()
         time.sleep(config.gradingInterval)
+
+
+if __name__ == "__main__":
+    main()

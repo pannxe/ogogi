@@ -1,0 +1,13 @@
+#! /usr/bin/env python3
+import sys
+import os
+
+if not os.path.exists("./install/installed") :
+    os.system("chmod +x ./install/install.sh")
+    os.system("./install/install.sh")
+
+sys.path.insert(1, './src/')
+
+import ogogi
+
+ogogi.main()

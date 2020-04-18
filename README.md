@@ -6,20 +6,19 @@ This is an attempt to improve [otogGrader](https://otog.cf/) mainly by implement
 
 ## Now implemented
 
-- **Modularization.**
-- **Unlimited # of testcase.**
+- **Now implemented external comparing script**
+- Modularization.
+- Unlimited # of testcase.
 - **Command mode (type ' : ')**
-    - Featuring '**reload**' command. Reload any module without having to restart the grader.
+  - Featuring '**reload**' command. Reload any module without having to restart the grader.
 - Improved debug console.
 - Cleaner code for better maintainent.
 - Minor performance improvement.
-- **Beta** Implementation of Golang.
 
 ## Todo
 
 Todo is short-term plans that ment to be done within current version.
 
-- **Process buffer in interactiveScript.py**
 - **Add more functionality to command mode**
 - Debug.
 - Error handling.
@@ -32,24 +31,6 @@ Features to add in future version.
 - Reimplement modules using class.
 - Add support for other languages. (to be considered)
 
-## External modules
-
-These are external modules used in this project.
-
-### Colorama
-
-```bash
-pip3 install colorama
-```
-
-### Black
-
-For code formatting, use Black.
-
-```bash
-pip3 install black
-```
-
 ## Contributing
 
 YES, please :) Pull requests are welcome.
@@ -59,6 +40,7 @@ YES, please :) Pull requests are welcome.
 - **Karnjj** - *original work* - [Github](https://github.com/karnjj)
 - **pannxe** - *OGOGI project* - [Github](https://github.com/pannxe)
 - **Amethyst** - *supervisor* - [Github](https://github.com/sctpimming)
+- **krist7599555** - *supervisor* - [Github](https://github.com/krist7599555)
 
 ## License
 

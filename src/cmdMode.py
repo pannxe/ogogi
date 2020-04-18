@@ -14,7 +14,7 @@ def help():
     print("shutdown\tTerminate OGOGI.")
 
 
-def run():
+def run() -> (int, list):
     print(abb.bold + Fore.YELLOW + "OGOGI-shell" + Style.RESET_ALL + "$ ", end="")
     s = input()
     cmd = s.split(" ")
