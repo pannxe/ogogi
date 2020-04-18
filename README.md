@@ -31,6 +31,20 @@ Features to add in future version.
 - Reimplement modules using class.
 - Add support for other languages. (to be considered)
 
+## How to write interactive script
+
+Must be named ```interactive_script.py``` and put in source/probName.
+Template:
+
+```python
+# interactive_script.py
+def cmp(
+  resultPath  : "Path to result file",
+  solutionPath: "Path to solution file") -> bool:
+  # Do some stuff
+  return result # True = P; False = -
+```
+
 ## Contributing
 
 YES, please :) Pull requests are welcome.
