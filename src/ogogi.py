@@ -38,16 +38,17 @@ def onRecieved(submission, probInfo):
     print(abb.bold + "Prob ID   :\t" + probID + Style.RESET_ALL)
     probName = str(probInfo[2])
 
-    allResult = ""
+    resultStr = ""
     sumTime = 0
     nCase = 0
 
     complieResult = None
 
     # Interprete subject source file name
-    subjectFileName = config.subjectFileName.replace("[probID]", probID).replace(
-        "[uploadTime]", uploadTime
-    )
+    subjectFileName = config.subjectFileName
+    _replaces = [("[probID]", probID), ("[uploadTime]", uploadTime)]
+    for ph, rep in _replaces:
+        subjectFileName = subjectFileName.replace(ph, rep)
 
     scriptPath = config.scriptPath.replace("[probName]", probName)
 
@@ -74,10 +75,10 @@ def onRecieved(submission, probInfo):
             subtask = probInfo[8].split(" ")
         else:
             subtask = [nCase]
-        allResult, sumTime = gradingScript.run(submission, probInfo, subtask)
+        resultStr, sumTime = gradingScript.run(submission, probInfo, subtask)
     # Compile error
     elif complieResult == "NOCMP":
-        allResult = "Compilation Error"
+        resultStr = "Compilation Error"
         print(abb.error + "Failed to compile subject's file.")
         # Try to read error message
         try:
@@ -87,12 +88,12 @@ def onRecieved(submission, probInfo):
             errmsg = "Cannot read error log. Unknown problem occured."
     # File extension not supported
     elif complieResult == "NOLANG":
-        allResult = "Compilation Error"
+        resultStr = "Compilation Error"
         errmsg = "Language not supported. Please check file extension."
         print(abb.error + "Language not supported.")
     # Missing config file (config.cfg or script.php)
     elif complieResult == "NOCONFIG":
-        allResult = "Compilation Error"
+        resultStr = "Compilation Error"
         errmsg = "Cannot read config file. Please contact admins."
         print(abb.error + "script.php is missing.")
 
@@ -100,7 +101,7 @@ def onRecieved(submission, probInfo):
     percentage = 0
     if complieResult == None:
         print(abb.bold + "\nResult    :\t[" + abb.bold, end="")
-        for e in allResult:
+        for e in resultStr:
             if e == "P":
                 print(Fore.GREEN, end="")
             else:
@@ -108,11 +109,11 @@ def onRecieved(submission, probInfo):
             print(e, end="")
         print(Style.RESET_ALL + abb.bold + "]")
         # Count correct answer by counting 'P'
-        nCorrect = allResult.count("P")
+        nCorrect = resultStr.count("P")
         print("Time      :\t" + str(round(sumTime, 2)) + " s" + Style.RESET_ALL)
         percentage = 100 * (nCorrect / nCase)
 
-    return (allResult, percentage, round(sumTime, 2), errmsg, resultID)
+    return (resultStr, percentage, round(sumTime, 2), errmsg, resultID)
 
 
 def main():
@@ -137,18 +138,19 @@ def main():
     while True:
         # Looking for keyboard interupt.
         if kb.kbhit():
-            c = kb.getch()
-            if c == ":":
+            if kb.getch() == ":":
                 # Do functions.
                 print(ogogi + "Keyboard interupted. Entering command mode.")
                 kb.set_normal_term()
+
+                # Command mode
                 while True:
                     cmd, args = cmdMode.run()
                     # Shutdown signal
                     if cmd == abb.INCMD["SHUTDOWN"]:
                         # Good-bye message
                         print(ogogi + "Bye")
-                        exit()
+                        exit(0)
                     elif cmd == abb.INCMD["RELOAD"]:
                         # Reload modules in args
                         for e in args:

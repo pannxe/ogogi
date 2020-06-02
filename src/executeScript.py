@@ -23,7 +23,9 @@ def execute(
         + config.lang[language]["execute"]
         + "; exit;"
     )
-    cmd = cmd.replace("[binName]", exeName).replace("[IORedirect]", IORedirect)
+    _replaces = [("[binName]", exeName), ("[IORedirect]", IORedirect)]
+    for ph, rep in _replaces:
+        cmd = cmd.replace(ph, rep)
 
     # Why do we have to chmod this?
     # os.system('chmod 777 .')

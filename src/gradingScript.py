@@ -1,30 +1,9 @@
 import os
-import execu
+import executeScript
 import config
 import handler
 import abb
-
-
-def cmpFunc(fname1, fname2):
-    f1 = open(fname1)
-    f2 = open(fname2)
-
-    f1_line = f1.readline()
-    f2_line = f2.readline()
-
-    while f1_line != "" or f2_line != "":
-        f1_line = f1_line.rstrip()
-        f2_line = f2_line.rstrip()
-        if f1_line != f2_line:
-            f1.close()
-            f2.close()
-            return False
-        f1_line = f1.readline()
-        f2_line = f2.readline()
-
-    f1.close()
-    f2.close()
-    return True
+from compareEqual import *
 
 
 def run(submission, probInfo, subtask):
@@ -36,7 +15,7 @@ def run(submission, probInfo, subtask):
     perfect = True
     lastTest = 0
 
-    allResult = ""
+    resultStr = ""
     sumTime = 0
 
     uploadTime = str(submission[1])
@@ -44,20 +23,20 @@ def run(submission, probInfo, subtask):
     probID = str(submission[3])
     inContest = submission[9]
     language = submission[10]
-    interacive_flag = False
+    isInteracive = False
 
     for sub in subtask:
         if inContest:
-            allResult += "["
+            resultStr += "["
         if not perfect:
             for x in range(lastTest, int(sub)):
-                allResult += "S"
+                resultStr += "S"
             if inContest:
-                allResult += "]"
+                resultStr += "]"
             lastTest = int(sub)
             continue
         for x in range(lastTest, int(sub)):
-            t, elapsedTime = execu.execute(
+            t, elapsedTime = executeScript.execute(
                 language,
                 userID,
                 probName,
@@ -71,18 +50,21 @@ def run(submission, probInfo, subtask):
             sumTime += elapsedTime
 
             resultPath = config.resultPath
-            solutionPath = config.solutionPath.replace("[probName]", probName).replace(
-                "[#]", str(x + 1)
-            )
+
+            solutionPath = config.solutionPath
+            _replaces = [("[probName]", probName), ("[#]", str(x + 1))]
+            for ph, rep in _replaces:
+                solutionPath = solutionPath.replace(ph, rep)
+
             res = False
             if execResult == None and t == 0:
                 # Interprete interactive_script.py path.
                 interactivePath = config.interactivePath.replace("[probName]", probName)
                 # If the problem is interacive...
                 if os.path.exists(interactivePath + config.interactiveName):
-                    if not interacive_flag:
+                    if not isInteracive:
                         print("\t--> This problem is interactive.")
-                        interacive_flag = True
+                        isInteracive = True
                     import sys
 
                     sys.path.insert(1, "./" + interactivePath)
@@ -91,19 +73,19 @@ def run(submission, probInfo, subtask):
                     # Call interactive script.
                     res = interactive_script.cmp(resultPath, solutionPath)
                 else:
-                    res = cmpFunc(resultPath, solutionPath)
+                    res = compareEqual(resultPath, solutionPath)
                 if res:
-                    allResult += "P"
+                    resultStr += "P"
                 else:
                     perfect = False
-                    allResult += "-"
+                    resultStr += "-"
             elif execResult == "TLE":
-                allResult += "T"
+                resultStr += "T"
                 perfect = False
             else:
-                allResult += "X"
+                resultStr += "X"
                 perfect = False
         if inContest:
-            allResult += "]"
+            resultStr += "]"
             lastTest = int(sub)
-    return (allResult, sumTime)
+    return (resultStr, sumTime)
