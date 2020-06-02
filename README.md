@@ -4,6 +4,8 @@
 
 This is an attempt to improve [otogGrader](https://otog.cf/) mainly by implementing interactive script. OGOGI is also planed to use Cython for better performance.
 
+![srceenshot](/img/screenshot.jpg)
+
 ## Now implemented
 
 - **Now implemented external comparing script**
