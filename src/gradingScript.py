@@ -61,20 +61,19 @@ def run(submission, probInfo, subtask):
                 # Interprete interactive_script.py path.
                 interactivePath = config.interactivePath.replace("[probName]", probName)
                 # If the problem is interacive...
-                if os.path.exists(interactivePath + config.interactiveName):
+                if os.path.exists(interactivePath):
                     if not isInteracive:
                         print("\t--> This problem is interactive.")
                         isInteracive = True
-                    import sys
-
-                    sys.path.insert(1, "./" + interactivePath)
+                    import subprocess
+                    # Call interactive script.
                     try:
-                        import interactive_script
-
-                        # Call interactive script.
-                        res = interactive_script.cmp(resultPath, solutionPath)
+                        interactive_script = subprocess.Popen(['python3', interactivePath, resultPath, solutionPath], stdout=subprocess.PIPE)
+                        stdout = interactive_script.communicate()[0].decode('UTF-8').strip()
+                        res = True if stdout == "P" else False
                     except:
-                        print(abb.error + "Cannot import interactive script.\n\t--> Abort")
+                        print(abb.error + "Cannot grade using interactive script.\n\t--> Abort")
+                        return ("Grading Script Error", -1)
                 else:
                     res = compareEqual(resultPath, solutionPath)
                 if res:

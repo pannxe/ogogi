@@ -30,7 +30,6 @@ caseKeyEnd = ";"
 
 scriptPath = "source/[probName]/script.php"
 
-interactiveName = "interactive_script.py"
-interactivePath = "source/[probName]/"
+interactivePath = "source/[probName]/interactive_script.py"
 
 gradingInterval = 1

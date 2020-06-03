@@ -76,6 +76,12 @@ def onRecieved(submission, probInfo):
         else:
             subtask = [nCase]
         resultStr, sumTime = gradingScript.run(submission, probInfo, subtask)
+        # If grading script error (interactive)
+        if sumTime == -1:
+            complieResult == "INTERERR"
+            errmsg = "Grading script error, contact admin."
+            sumTime = 0
+
     # Compile error
     elif complieResult == "NOCMP":
         resultStr = "Compilation Error"
