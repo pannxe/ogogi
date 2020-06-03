@@ -11,8 +11,6 @@ This is an attempt to improve [otogGrader](https://otog.cf/) mainly by implement
 - **Now implemented external comparing script**
 - Modularization.
 - Unlimited # of testcase.
-- **Command mode (type ' : ')**
-  - Featuring '**reload**' command. Reload any module without having to restart the grader.
 - Improved debug console.
 - Cleaner code for better maintainent.
 - Minor performance improvement.

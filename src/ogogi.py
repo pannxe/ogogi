@@ -12,11 +12,9 @@ import config
 import compileScript
 import gradingScript
 import abb
-import cmdMode
 import importlib
 import sys
 
-from kbhit import KBHit
 from colorama import Style, Fore, init  # Terminal decoration
 
 ogogi_bare = abb.bold + Fore.YELLOW + "OGOGI" + Style.RESET_ALL
@@ -116,10 +114,11 @@ def onRecieved(submission, probInfo):
         print(Style.RESET_ALL + abb.bold + "]")
         # Count correct answer by counting 'P'
         nCorrect = resultStr.count("P")
-        print("Time      :\t" + str(round(sumTime, 2)) + " s" + Style.RESET_ALL)
+        roundedTime = round(sumTime, 2)
+        print("Time      :\t" + str(roundedTime) + " s" + Style.RESET_ALL)
         percentage = 100 * (nCorrect / nCase)
 
-    return (resultStr, percentage, round(sumTime, 2), errmsg, resultID)
+    return (resultStr, percentage, roundedTime, errmsg, resultID)
 
 
 def main():
@@ -139,42 +138,8 @@ def main():
 
     # for keybord interupt.
     print(ogogi + "Grader started. Waiting for submission...")
-    kb = KBHit()
 
     while True:
-        # Looking for keyboard interupt.
-        if kb.kbhit():
-            if kb.getch() == ":":
-                # Do functions.
-                print(ogogi + "Keyboard interupted. Entering command mode.")
-                kb.set_normal_term()
-
-                # Command mode
-                while True:
-                    cmd, args = cmdMode.run()
-                    # Shutdown signal
-                    if cmd == abb.INCMD["SHUTDOWN"]:
-                        # Good-bye message
-                        print(ogogi + "Bye")
-                        exit(0)
-                    elif cmd == abb.INCMD["RELOAD"]:
-                        # Reload modules in args
-                        for e in args:
-                            if e == "grader":
-                                print(
-                                    abb.error
-                                    + "'grader' itself cannot be reloaded. Please restart the program manually."
-                                )
-                            try:
-                                importlib.reload(importlib.import_module(e))
-                            except:
-                                print(abb.error + "'" + e + "' cannot be reloaded.")
-                    elif cmd == abb.INCMD["EXIT"]:
-                        break
-
-                kb.set_kbhit_term()
-                print(ogogi + "Command mode exited. Continue waiting for submission.")
-
         myCursor.execute("SELECT * FROM Result WHERE status = 0 ORDER BY time")
         submission = myCursor.fetchone()
         if submission != None:
