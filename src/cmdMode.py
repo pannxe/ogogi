@@ -10,7 +10,7 @@ def help():
     print("help\t\tDisplay help page.")
     print("exit\t\tExit command mode.")
     print("t [args]\tIssue [args] to system terminal.")
-    print("reload [name]\t reload [name] module.")
+    print("reload [name]\treload [name] module.")
     print("shutdown\tTerminate OGOGI.")
 
 
@@ -28,7 +28,9 @@ def run():
         return abb.INCMD["SHUTDOWN"], []
     elif cmd[0] == "help":
         help()
+        return abb.INCMD["NONE"], []
     elif cmd[0] == "reload":
         return abb.INCMD["RELOAD"], cmd[1:]
     else:
+        help()
         return 0, []
