@@ -14,16 +14,14 @@ def help():
     print("shutdown\tTerminate OGOGI.")
 
 
-def run() -> (int, list):
+def run():
     print(abb.bold + Fore.YELLOW + "OGOGI-shell" + Style.RESET_ALL + "$ ", end="")
     s = input()
-    cmd = s.split(" ")
+    cmd = s.split()
     if cmd[0] == "exit":
         return abb.INCMD["EXIT"], []
     elif cmd[0] == "t":
-        args = ""
-        for e in cmd[1:]:
-            args += e + " "
+        args = " ".join(cmd[1:])
         subprocess.call(args, shell=True)
         return abb.INCMD["NONE"], []
     elif cmd[0] == "shutdown":

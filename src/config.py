@@ -13,15 +13,7 @@ lang = {
         "compile": "g++ ../uploaded/[userID]/[subjectFileName].cpp -O2 -fomit-frame-pointer -o compiled/[subjectFileName] "
         + IORedirect,
         "execute": "compiled/[binName] [IORedirect]",
-    },
-    # Test adding new language via config.lang
-    "Golang": {
-        "extension": "go",
-        "system": "find /usr/bin/ -name go",
-        "compile": "go tool compile -o compiled/[subjectFileName] ../uploaded/[userID]/[subjectFileName].go "
-        + IORedirect,
-        "execute": "compiled/[binName] [IORedirect]",
-    },
+    }
 }
 
 # Paths must be relative to ogogi directory

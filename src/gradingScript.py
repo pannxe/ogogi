@@ -68,10 +68,13 @@ def run(submission, probInfo, subtask):
                     import sys
 
                     sys.path.insert(1, "./" + interactivePath)
-                    import interactive_script
+                    try:
+                        import interactive_script
 
-                    # Call interactive script.
-                    res = interactive_script.cmp(resultPath, solutionPath)
+                        # Call interactive script.
+                        res = interactive_script.cmp(resultPath, solutionPath)
+                    except:
+                        print(abb.error + "Cannot import interactive script.\n\t--> Abort")
                 else:
                     res = compareEqual(resultPath, solutionPath)
                 if res:

@@ -13,8 +13,11 @@ def compile(fileName, userID, language):
     print("Compiling subject's file...")
 
     compileCMD = config.lang[language]["compile"]
-    compileCMD = compileCMD.replace("[subjectFileName]", fileName)
-    compileCMD = compileCMD.replace("[userID]", userID)
+
+    _replace = [("[subjectFileName]", fileName), ("[userID]", userID)]
+
+    for ph, rep in _replace:
+        compileCMD = compileCMD.replace(ph, rep)
 
     os.system(compileCMD)
 
