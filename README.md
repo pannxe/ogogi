@@ -23,7 +23,7 @@ Todo is short-term plans that ment to be done within current version.
 
 - **Add more functionality to command mode**
 - Debug.
-- Error handling.
+- More error handling.
 
 ## Roadmap
 
@@ -40,11 +40,32 @@ Template:
 
 ```python
 # interactive_script.py
-def cmp(
-  resultPath  : "Path to result file",
-  solutionPath: "Path to solution file") -> bool:
-  # Do some stuff
-  return result # True = P; False = -
+import sys
+resultPath   = sys.argv[1]
+problemDir   = sys.argv[2]
+atCase       = sys.argv[3]
+
+# Do something
+
+if answer_is_correct:
+  print("P")
+else:
+  print("-")
+```
+
+## Folder Structure
+
+```
+/grader
+  /compiled
+  /env
+  /img
+  /install
+  /source
+  .gitignore
+  LICENSE
+  ogogi
+  README.md
 ```
 
 ## Contributing

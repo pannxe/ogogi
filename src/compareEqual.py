@@ -1,6 +1,5 @@
 import fileIO
 
-
 def compareEqual(path_1, path_2):
     cleaned_1 = fileIO.read(path_1).strip()
     cleaned_2 = fileIO.read(path_2).strip()

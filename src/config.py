@@ -13,10 +13,12 @@ lang = {
         "compile": "g++ ../uploaded/[userID]/[subjectFileName].cpp -O2 -fomit-frame-pointer -o compiled/[subjectFileName] "
         + IORedirect,
         "execute": "compiled/[binName] [IORedirect]",
-    }
+    },
 }
 
 # Paths must be relative to ogogi directory
+
+problemDirectory = "source/[probName]/"
 
 legacyScriptPath = "source/[probName]/script.php"
 configPath = "source/[probName]/config.cfg"

@@ -3,7 +3,7 @@ import executeScript
 import config
 import handler
 import abb
-from compareEqual import *
+from compareEqual import compareEqual
 
 
 def run(submission, probInfo, subtask):
@@ -66,13 +66,28 @@ def run(submission, probInfo, subtask):
                         print("\t--> This problem is interactive.")
                         isInteracive = True
                     import subprocess
+
                     # Call interactive script.
                     try:
-                        interactive_script = subprocess.Popen(['python3', interactivePath, resultPath, solutionPath], stdout=subprocess.PIPE)
-                        stdout = interactive_script.communicate()[0].decode('UTF-8').strip()
+                        interactive_script = subprocess.Popen(
+                            [
+                                "python3",
+                                interactivePath,
+                                resultPath,
+                                config.problemDirectory.replace("[probName]", probName),
+                                str(x + 1),
+                            ],
+                            stdout=subprocess.PIPE,
+                        )
+                        stdout = (
+                            interactive_script.communicate()[0].decode("UTF-8").strip()
+                        )
                         res = True if stdout == "P" else False
                     except:
-                        print(abb.error + "Cannot grade using interactive script.\n\t--> Abort")
+                        print(
+                            abb.error
+                            + "Cannot grade using interactive script.\n\t--> Abort"
+                        )
                         return ("Grading Script Error", -1)
                 else:
                     res = compareEqual(resultPath, solutionPath)
