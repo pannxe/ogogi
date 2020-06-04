@@ -103,6 +103,7 @@ def onRecieved(submission, probInfo):
 
     # Calculate score
     percentage = 0
+    roundedTime = 0
     if complieResult == None:
         print(abb.bold + "\nResult    :\t[" + abb.bold, end="")
         for e in resultStr:
