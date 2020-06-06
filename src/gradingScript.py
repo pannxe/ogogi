@@ -6,7 +6,7 @@ import abb
 from compareEqual import compareEqual
 
 
-def run(submission, probInfo, subtask):
+def run(submission, probInfo, subtask, mydb):
     probName = str(probInfo[2])
     timeLimit = float(probInfo[4])
     memLimit = int(probInfo[5])
@@ -36,6 +36,12 @@ def run(submission, probInfo, subtask):
             lastTest = int(sub)
             continue
         for x in range(lastTest, int(sub)):
+            mycursor = mydb.cursor(buffered=True)
+            sql = "UPDATE Result SET result = %s WHERE idResult = %s"
+            val = ("Running in testcase " + str(x + 1), submission[0])
+            mycursor.execute(sql, val)
+            mydb.commit()
+
             t, elapsedTime = executeScript.execute(
                 language,
                 userID,

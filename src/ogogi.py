@@ -23,7 +23,7 @@ ogogi_bare = abb.bold + Fore.YELLOW + "OGOGI" + Style.RESET_ALL
 ogogi = "[ " + ogogi_bare + " ] "
 
 
-def onRecieved(submission, probInfo):
+def onRecieved(submission, probInfo, mydb):
     # Reassign for better readability
     resultID = submission[0]
     uploadTime = str(submission[1])
@@ -75,7 +75,7 @@ def onRecieved(submission, probInfo):
             subtask = probInfo[8].split(" ")
         else:
             subtask = [nCase]
-        resultStr, sumTime = gradingScript.run(submission, probInfo, subtask)
+        resultStr, sumTime = gradingScript.run(submission, probInfo, subtask, mydb)
         # If grading script error (interactive)
         if sumTime == -1:
             complieResult == "INTERERR"
@@ -191,7 +191,7 @@ def main():
 
             # Submit result
             sql = "UPDATE Result SET result = %s, score = %s, timeuse = %s, status = 1, errmsg = %s WHERE idResult = %s"
-            val = onRecieved(submission, probInfo)
+            val = onRecieved(submission, probInfo, mydb)
             myCursor.execute(sql, val)
             print("---------------------------------------------------")
             print("\n" + ogogi + "Finished grading session. Waiting for the next one.")
