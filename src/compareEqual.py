@@ -1,10 +1,9 @@
-import fileIO
-
 def compareEqual(path_1, path_2):
-    cleaned_1 = fileIO.read(path_1).strip()
-    cleaned_2 = fileIO.read(path_2).strip()
-
-    lines_1 = [line.rstrip() for line in cleaned_1.splitlines()]
-    lines_2 = [line.rstrip() for line in cleaned_2.splitlines()]
-
-    return lines_1 == lines_2
+    with open(path_1) as f1, open(path_2) as f2:
+        while True:
+            f1_line = f1.readline()
+            f2_line = f2.readline()
+            if f1_line == "" and f2_line == "":
+                return True
+            if f1_line.rstrip() != f2_line.rstrip():
+                return False

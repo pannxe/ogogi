@@ -21,7 +21,7 @@ ogogi_bare = abb.bold + Fore.YELLOW + "OGOGI" + Style.RESET_ALL
 ogogi = "[ " + ogogi_bare + " ] "
 
 
-def onRecieved(submission, probInfo):
+def onRecieved(submission, probInfo, mydb):
     # Reassign for better readability
     resultID = submission[0]
     uploadTime = str(submission[1])
@@ -63,7 +63,8 @@ def onRecieved(submission, probInfo):
 
     # Compile subject's source file
     if complieResult == None:
-        complieResult = compileScript.compile(subjectFileName, userID, language)
+        complieResult = compileScript.compile(
+            subjectFileName, userID, language)
 
     # If there is no problem compiling, grade the subject.
     errmsg = ""
@@ -73,13 +74,13 @@ def onRecieved(submission, probInfo):
             subtask = probInfo[8].split(" ")
         else:
             subtask = [nCase]
-        resultStr, sumTime = gradingScript.run(submission, probInfo, subtask)
+        resultStr, sumTime = gradingScript.run(
+            submission, probInfo, subtask, mydb)
         # If grading script error (interactive)
         if sumTime == -1:
             complieResult == "INTERERR"
             errmsg = "Grading script error, contact admin."
             sumTime = 0
-
 
     # Compile error
     elif complieResult == "NOCMP":
@@ -104,7 +105,6 @@ def onRecieved(submission, probInfo):
 
     # Calculate score
     percentage = 0
-    roundedTime = 0
     if complieResult == None:
         print(abb.bold + "\nResult    :\t[" + abb.bold, end="")
         for e in resultStr:
@@ -116,11 +116,10 @@ def onRecieved(submission, probInfo):
         print(Style.RESET_ALL + abb.bold + "]")
         # Count correct answer by counting 'P'
         nCorrect = resultStr.count("P")
-        roundedTime = round(sumTime, 2)
-        print("Time      :\t" + str(roundedTime) + " s" + Style.RESET_ALL)
+        print("Time      :\t" + str(round(sumTime, 2)) + " s" + Style.RESET_ALL)
         percentage = 100 * (nCorrect / nCase)
 
-    return (resultStr, percentage, roundedTime, errmsg, resultID)
+    return (resultStr, percentage, round(sumTime, 2), errmsg, resultID)
 
 
 def main():
@@ -140,6 +139,7 @@ def main():
 
     # for keybord interupt.
     print(ogogi + "Grader started. Waiting for submission...")
+    kb = KBHit()
 
     while True:
         myCursor.execute("SELECT * FROM Result WHERE status = 0 ORDER BY time")
@@ -158,7 +158,7 @@ def main():
 
             # Submit result
             sql = "UPDATE Result SET result = %s, score = %s, timeuse = %s, status = 1, errmsg = %s WHERE idResult = %s"
-            val = onRecieved(submission, probInfo)
+            val = onRecieved(submission, probInfo, mydb)
             myCursor.execute(sql, val)
             print("---------------------------------------------------")
             print("\n" + ogogi + "Finished grading session. Waiting for the next one.")
