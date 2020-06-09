@@ -80,6 +80,7 @@ def onRecieved(submission, probInfo):
             errmsg = "Grading script error, contact admin."
             sumTime = 0
 
+
     # Compile error
     elif complieResult == "NOCMP":
         resultStr = "Compilation Error"
